@@ -1,6 +1,7 @@
 from model.board import Board
 from model.tetromino_shapes import TTetromino, ITetromino, OTetromino, LTetromino, JTetromino, STetromino, ZTetromino
 from model.point import Point
+import pygame
 import random
 
 class GameState:
@@ -24,10 +25,16 @@ class GameState:
                 self.board.place_tetromino(self.current_tetromino)
                 self.clear_and_reset()
 
-    def hard_drop(self):
+    def hard_drop(self, screen, draw_func, grid_size):
         while not self.board.is_collision(self.current_tetromino):
             self.current_tetromino.move(Point(0, 1))
-        self.current_tetromino.move(Point(0, -1))
+            if self.board.is_collision(self.current_tetromino):
+                self.current_tetromino.move(Point(0, -1))
+                break
+            screen.fill((0, 0, 0))
+            draw_func(screen, self)
+            pygame.display.flip()
+            pygame.time.wait(30)
         self.board.place_tetromino(self.current_tetromino)
         self.clear_and_reset()
 
@@ -44,8 +51,7 @@ class GameState:
         self.current_tetromino.anchor = Point(self.board.width // 2, 0)
         if self.board.is_collision(self.current_tetromino):
             self.is_game_over = True
-            
+
     def update_score(self, rows_cleared):
         if rows_cleared > 0:
             self.score += (2 * rows_cleared) ** 2
-

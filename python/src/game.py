@@ -28,7 +28,7 @@ class Game:
                 elif event.key == pygame.K_UP:
                     self.game_state.rotate_tetromino()
                 elif event.key == pygame.K_SPACE:
-                    self.game_state.hard_drop()
+                    self.game_state.hard_drop(self.screen, self.render_game, self.grid_size)
 
     def automatic_drop(self):
         current_time = pygame.time.get_ticks()
@@ -45,17 +45,20 @@ class Game:
         if self.game_state.is_game_over:
             self.running = False
 
+    def render_game(self, screen, game_state):
+        screen.fill((0, 0, 0))
+        draw_board(screen, game_state.board, self.grid_size)
+        draw_tetromino(screen, game_state.current_tetromino, self.grid_size)
+        self.render_score()
+
     def run(self):
         while self.running:
-            self.screen.fill((0, 0, 0))
             self.handle_events()
-            draw_board(self.screen, self.game_state.board, self.grid_size)
-            draw_board_grid(self.screen, self.game_state.board.width, self.game_state.board.height, self.grid_size)
-            draw_tetromino(self.screen, self.game_state.current_tetromino, self.grid_size)
-            self.render_score()
             self.automatic_drop()
+            self.render_game(self.screen, self.game_state)
             pygame.display.flip()
             self.clock.tick(60)
+        pygame.quit()
             
     def render_score(self):
         score_text = f"Score: {self.game_state.score}"
